@@ -1,0 +1,211 @@
+---
+title: "King Count Tract Level Maps"
+author: "Brian Bartley"
+date: "4/14/2022"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float:
+      collapsed: true
+      smooth_scroll: false
+---
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(cluster)
+library(viridis)
+library(leaflet)
+library(tmap)
+library(sf)
+library(factoextra)
+demographics <- read_rds("King County Tract Level Demographics.rds")
+#writing a little code to get rid of lang data
+langs <- c("l_spanish",
+           "l_russian",
+           "l_korean",
+           "l_chinese",
+           "l_vietnamese",
+           "l_other_lang")
+demographics <- demographics %>% select (-langs)
+```
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+set.seed(23994)
+vars <- demographics %>% select(-GEOID, -tract, -county, -state, -geometry) %>% colnames()
+to_cluster <- demographics %>% select(-county, -tract, -state, -geometry)
+row.names(to_cluster) <- to_cluster$GEOID
+to_cluster$GEOID <- NULL
+distance_matrix <- cluster::daisy(demographics[,vars])
+res.pam <- cluster::pam(x=distance_matrix, k = 5, cluster.only = F)
+demographics$cluster <- as.double(res.pam$clustering)
+```
+
+# Clustering demographic data
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+demographics$cluster <- factor(demographics$cluster,
+                                  levels=c(1,3,5,2,4),
+                                  labels=c("low income",
+                                           "low middle income",
+                                           "middle",
+                                           "high middle income",
+                                           "high income"),
+                                  ordered=T)
+tmap_mode("plot")
+demographics %>%
+  st_sf() %>% tm_shape() + 
+  tm_polygons(col = "cluster",
+          palette = "Set1",
+          title = "relative income",
+          legend.hist = TRUE) +
+  tm_layout(title = "Cluster by\nDemographic\nCharachteristic",
+            frame = FALSE,
+            legend.outside = TRUE,
+            bg.color = "grey70",
+            legend.hist.width = .8) +
+    tm_scale_bar(position = c("left", "bottom"))
+```
+
+# Dynamic Maps
+
+# Demographic clusters
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#demographics %>% colnames()
+tmap_mode("view")
+x <- "cluster"
+y <- "demographic cluster"
+demographics %>%
+  st_sf() %>% tm_shape() + 
+  tm_polygons(col = x,
+              style = "quantile",
+          palette = "Set1",
+          title = paste(y),
+          alpha = .3,
+          popup.vars = c("tract", x))+
+  tm_basemap(leaflet::providers$OpenStreetMap)
+```
+
+# Income
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+x <- "medinc"
+y <- "median income"
+z <- " quintile"
+demographics %>%
+  st_sf() %>% tm_shape() + 
+  tm_polygons(col = x,
+              style = "quantile",
+          palette = "Set1",
+          title = paste(y,z),
+          alpha = .3,
+          popup.vars = c("tract", x))+
+  tm_basemap(leaflet::providers$OpenStreetMap)
+```
+
+# Poverty
+Percent of people living within 200% of the federal poverty line.
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#demographics %>% colnames()
+x <- "p_pov"
+y <- "% below 2X poverty"
+z <- " quintile"
+demographics %>%
+  st_sf() %>% tm_shape() + 
+  tm_polygons(col = x,
+              style = "quantile",
+          palette = "Set1",
+          title = paste(y,z),
+          alpha = .3,
+          popup.vars = c("tract", x))+
+  tm_basemap(leaflet::providers$OpenStreetMap)
+```
+
+# Disabilities 
+Percent of the people living with a federally reconginzed disability.
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#demographics %>% colnames()
+x <- "p_ability"
+y <- "% disabiliity"
+z <- " quintile"
+demographics %>%
+  st_sf() %>% tm_shape() + 
+  tm_polygons(col = x,
+              style = "quantile",
+          palette = "Set1",
+          title = paste(y,z),
+          alpha = .3,
+          popup.vars = c("tract", x))+
+  tm_basemap(leaflet::providers$OpenStreetMap)
+```
+
+# Age
+Percent of people 65 and up.
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#demographics %>% colnames()
+x <- "p_65_up"
+y <- "% 65 and up"
+z <- " quintile"
+demographics %>%
+  st_sf() %>% tm_shape() + 
+  tm_polygons(col = x,
+              style = "quantile",
+          palette = "Set1",
+          title = paste(y,z),
+          alpha = .3,
+          popup.vars = c("tract", x))+
+  tm_basemap(leaflet::providers$OpenStreetMap)
+```
+
+# Limited English proficiency 
+Percent of people who speak english less than well.
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#demographics %>% colnames()
+x <- "p_e_less"
+y <- "% limited Eng."
+z <- " quintile"
+demographics %>%
+  st_sf() %>% tm_shape() + 
+  tm_polygons(col = x,
+              style = "quantile",
+          palette = "Set1",
+          title = paste(y,z),
+          alpha = .3,
+          popup.vars = c("tract", x))+
+  tm_basemap(leaflet::providers$OpenStreetMap)
+```
+
+# Native population
+Percent of people who are Indigenous to the area or Native American.
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# demographics %>% colnames()
+x <- "amercian_Indian_alone"
+y <- "% Native Amerian"
+z <- " quintile"
+demographics %>%
+  st_sf() %>% tm_shape() + 
+  tm_polygons(col = x,
+              style = "quantile",
+          palette = "Set1",
+          title = paste(y,z),
+          alpha = .3,
+          popup.vars = c("tract", x))+
+  tm_basemap(leaflet::providers$OpenStreetMap)
+```
+
+# People of Color
+Percent of people who do not identify as White Non-Hispanic.
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+x <- "POC"
+y <- "% non-white"
+z <- " quintile"
+demographics %>% mutate(POC = (1-white_alone)) %>%
+  st_sf() %>% tm_shape() + 
+  tm_polygons(col = x,
+              style = "quantile",
+          palette = "Set1",
+          title = paste(y,z),
+          alpha = .3,
+          popup.vars = c("tract", x))+
+  tm_basemap(leaflet::providers$OpenStreetMap)
+```
+
+
+
