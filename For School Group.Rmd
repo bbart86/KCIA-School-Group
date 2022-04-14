@@ -67,7 +67,7 @@ demographics %>%
 
 # Dynamic Maps
 
-# Demographic clusters
+## Demographic clusters
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 #demographics %>% colnames()
 tmap_mode("view")
@@ -84,7 +84,7 @@ demographics %>%
   tm_basemap(leaflet::providers$OpenStreetMap)
 ```
 
-# Income
+## Income
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 x <- "medinc"
 y <- "median income"
@@ -100,7 +100,7 @@ demographics %>%
   tm_basemap(leaflet::providers$OpenStreetMap)
 ```
 
-# Poverty
+## Poverty
 Percent of people living within 200% of the federal poverty line.
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 #demographics %>% colnames()
@@ -118,7 +118,7 @@ demographics %>%
   tm_basemap(leaflet::providers$OpenStreetMap)
 ```
 
-# Disabilities 
+## Disabilities 
 Percent of the people living with a federally reconginzed disability.
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 #demographics %>% colnames()
@@ -136,7 +136,7 @@ demographics %>%
   tm_basemap(leaflet::providers$OpenStreetMap)
 ```
 
-# Age
+## Age
 Percent of people 65 and up.
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 #demographics %>% colnames()
@@ -154,7 +154,7 @@ demographics %>%
   tm_basemap(leaflet::providers$OpenStreetMap)
 ```
 
-# Limited English proficiency 
+## Limited English proficiency 
 Percent of people who speak english less than well.
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 #demographics %>% colnames()
@@ -172,7 +172,7 @@ demographics %>%
   tm_basemap(leaflet::providers$OpenStreetMap)
 ```
 
-# Native population
+## Native population
 Percent of people who are Indigenous to the area or Native American.
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # demographics %>% colnames()
@@ -190,7 +190,7 @@ demographics %>%
   tm_basemap(leaflet::providers$OpenStreetMap)
 ```
 
-# People of Color
+## People of Color
 Percent of people who do not identify as White Non-Hispanic.
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 x <- "POC"
